@@ -1,0 +1,12 @@
+# kind-config.yaml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  # Mapeia a porta 80 do contêiner do Kind para a porta 80 do seu localhost
+  # Isso é para que a porta do NodePort 30000 (ou qualquer outra) seja acessível via localhost
+  extraPortMappings:
+  - containerPort: 30000 # A porta que você definiu como NodePort no zabbix-web-service.yaml
+    hostPort: 30000 # A porta que será aberta no seu localhost
+    listenAddress: "0.0.0.0" # Opcional: Escuta em todas as interfaces, não apenas localhost
+    protocol: tcp

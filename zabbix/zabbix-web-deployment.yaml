@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zabbix-web
+spec:
+  selector:
+    matchLabels:
+      app: zabbix-web
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: zabbix-web
+    spec:
+      containers:
+        - name: zabbix-web
+          image: zabbix/zabbix-web-nginx-mysql:latest # Ou a versão exata que você usa
+          ports:
+            - containerPort: 8080 # Porta padrão do Nginx na imagem
+          env:
+            - name: ZBX_SERVER_HOST
+              value: zabbix-server # Nome do serviço do Zabbix Server
+            - name: DB_SERVER_HOST
+              value: mariadb # Nome do serviço do MariaDB
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: zabbix-db-secret
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: zabbix-db-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: zabbix-db-secret
+                  key: MYSQL_PASSWORD
+          resources: 
+            requests:
+              cpu: "300m"
+              memory: "512Mi"
+            limits:
+              cpu: "700m"
+              memory: "1Gi"

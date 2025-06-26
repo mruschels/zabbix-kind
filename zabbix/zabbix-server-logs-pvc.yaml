@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zabbix-server-logs-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce # Ou ReadWriteMany se seu provedor de armazenamento suportar e você precisar
+  resources:
+    requests:
+      storage: 1Gi # Ajuste o tamanho conforme a necessidade de logs

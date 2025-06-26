@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zabbix-server
+spec:
+  selector:
+    matchLabels:
+      app: zabbix-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: zabbix-server
+    spec:
+      containers:
+        - name: zabbix-server
+          image: zabbix/zabbix-server-mysql:latest # Ou a versão exata que você usa
+          ports:
+            - containerPort: 10051
+              name: zabbix-agent
+          env:
+            - name: DB_SERVER_HOST
+              value: mariadb # Nome do serviço do MariaDB
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: zabbix-db-secret
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: zabbix-db-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: zabbix-db-secret
+                  key: MYSQL_PASSWORD
+            - name: ZBX_DB_PASSWORD # Variável de ambiente esperada pela imagem Zabbix
+              valueFrom:
+                secretKeyRef:
+                  name: zabbix-db-secret
+                  key: MYSQL_PASSWORD 
+            - name: DB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: zabbix-db-secret
+                  key: MYSQL_ROOT_PASSWORD
+          resources: 
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+          volumeMounts:
+            - name: zabbix-server-config-volume
+              mountPath: /etc/zabbix/zabbix_server.conf
+              subPath: zabbix_server.conf # Monta apenas o arquivo
+            - name: zabbix-logs-volume
+              mountPath: /var/log/zabbix
+      volumes:
+        - name: zabbix-server-config-volume
+          configMap:
+            name: zabbix-server-config
+        - name: zabbix-logs-volume
+          persistentVolumeClaim:
+            claimName: zabbix-server-logs-pvc

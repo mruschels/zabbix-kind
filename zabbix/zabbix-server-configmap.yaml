@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zabbix-server-config
+data:
+  zabbix_server.conf: |
+    LogFile=/var/log/zabbix/zabbix_server.log
+    LogFileSize=1
+    #PidFile=/var/run/zabbix/zabbix_server.pid
+    DBHost=mariadb # Nome do serviço do MariaDB no cluster
+    DBName=zabbix
+    DBUser=zabbix
+    DBPassword=$(ZBX_DB_PASSWORD) # Será substituído pela variável de ambiente
+    SNMPTrapperFile=/var/log/snmptraps/snmptraps.log
+    Timeout=30
+    AlertScriptsPath=/usr/lib/zabbix/alertscripts
+    ExternalScripts=/usr/lib/zabbix/externalscripts
+    LogSlowQueries=3000
+    # Adicione outras configurações do seu zabbix_server.conf aqui

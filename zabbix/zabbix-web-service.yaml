@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zabbix-web
+spec:
+  selector:
+    app: zabbix-web
+  type: NodePort # Permite acessar de fora do cluster Minikube
+  ports:
+    - protocol: TCP
+      port: 80 # Porta que o serviço expõe
+      targetPort: 8080 # Porta que o contêiner Zabbix Web usa
+      nodePort: 30000 # Porta no host do Minikube (pode ser qualquer uma entre 30000-32767)
